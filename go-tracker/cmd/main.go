@@ -16,6 +16,7 @@ func main() {
 	dateStr := flag.String("date", "", "Date of task in DD-MM-YYYY format")
 	timeStr := flag.String("time", "", "Time of task in HH:MM format")
 	task := flag.String("task", "", "Name of the task")
+	deleteId := flag.Int("delete", 0, "Name of id to be deleted")
 	flag.Parse()
 
 	// Initialize db connections
@@ -36,6 +37,13 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error creating database entry: %v", err)
 		}
+	} else if *deleteId > 0 {
+		// Delete the task
+		err := db.DeleteTask(database, *deleteId)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Task deleted sucessfully")
 	} else {
 		// Get all tasks
 		tasks, err := db.GetTasks(database)
@@ -43,11 +51,11 @@ func main() {
 			log.Fatalf("Error getting data: %v", err)
 		}
 
-    // Display all tasks in table format
-    m := utils.CreateTable(tasks)
-    if _, err := tea.NewProgram(m).Run(); err != nil {
-      fmt.Println("Error displaying table", err)
-      os.Exit(1)
-    }
+		// Display all tasks in table format
+		m := utils.CreateTable(tasks)
+		if _, err := tea.NewProgram(m).Run(); err != nil {
+			fmt.Println("Error displaying table", err)
+			os.Exit(1)
+		}
 	}
 }

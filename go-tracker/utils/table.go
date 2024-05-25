@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"strconv"
+
 	"github.com/alanpramil7/go-time-tracker/db"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -10,10 +12,10 @@ import (
 var baseStyle = lipgloss.NewStyle().BorderStyle(lipgloss.NormalBorder()).BorderForeground(lipgloss.Color("240"))
 
 type model struct {
-  table table.Model
+	table table.Model
 }
 
-func (m model ) Init() tea.Cmd {return nil}
+func (m model) Init() tea.Cmd { return nil }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
@@ -28,10 +30,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "q", "ctrl+c":
 			return m, tea.Quit
-		// case "enter":
-		// 	return m, tea.Batch(
-		// 		tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
-		// 	)
+			// case "enter":
+			// 	return m, tea.Batch(
+			// 		tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
+			// 	)
 		}
 	}
 	m.table, cmd = m.table.Update(msg)
@@ -43,18 +45,19 @@ func (m model) View() string {
 }
 
 // Make rasks of []db.Tasks type to []table.Row
-func formatedTasksToRows (tasks []db.Tasks) []table.Row {
-  rows := make([]table.Row, len(tasks))
-  for i, task := range tasks {
-    rows[i] = table.Row{task.Date, task.Time, task.Task}
-  }
+func formatedTasksToRows(tasks []db.Tasks) []table.Row {
+	rows := make([]table.Row, len(tasks))
+	for i, task := range tasks {
+		rows[i] = table.Row{strconv.Itoa(int(task.ID)), task.Date, task.Time, task.Task}
+	}
 
-  return rows
+	return rows
 }
 
 // Function to create table
 func CreateTable(tasks []db.Tasks) model {
 	columns := []table.Column{
+		{Title: "ID", Width: 5},
 		{Title: "Date", Width: 12},
 		{Title: "Time", Width: 8},
 		{Title: "Task", Width: 12},
